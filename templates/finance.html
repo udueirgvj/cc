@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WittenWeb — حساب الدفع</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#05070a;--surface:#0a0e14;--card:#0f1520;--border:#182030;--border-bright:#1e2d40;--gold:#f0b429;--gold-dim:rgba(240,180,41,.1);--green:#10b981;--green-dim:rgba(16,185,129,.1);--red:#ef4444;--red-dim:rgba(239,68,68,.1);--blue:#3b82f6;--text:#e2e8f0;--muted:#4a5568;--muted2:#2d3748;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+#loginScreen{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;}
+.login-box{background:var(--surface);border:1px solid var(--border-bright);border-radius:16px;padding:3rem 2.5rem;width:100%;max-width:380px;text-align:center;animation:fadeUp .5s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.pw-input{width:100%;padding:.9rem 1rem;background:var(--card);border:1px solid var(--border-bright);border-radius:8px;color:var(--text);font-family:'Cairo',sans-serif;font-size:1rem;text-align:center;letter-spacing:3px;margin-bottom:1rem;direction:ltr;transition:border-color .2s;}
+.pw-input:focus{outline:none;border-color:var(--gold);}
+.login-btn{width:100%;padding:.9rem;background:var(--gold);color:#000;border:none;border-radius:8px;font-family:'Cairo',sans-serif;font-size:1rem;font-weight:900;cursor:pointer;}
+.login-err{color:var(--red);font-size:.8rem;margin-top:.8rem;display:none;}
+#financeApp{display:none;}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.header-brand{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;color:var(--gold);}
+.header-link{padding:.4rem .9rem;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--muted);text-decoration:none;font-size:.8rem;margin-right:.5rem;}
+.main{max-width:1200px;margin:0 auto;padding:2rem;}
+.balance-hero{background:var(--surface);border:1px solid var(--border-bright);border-radius:16px;padding:2.5rem;margin-bottom:2rem;text-align:center;position:relative;overflow:hidden;}
+.balance-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(240,180,41,.06),transparent 70%);}
+.balance-amount{font-family:'Bebas Neue',sans-serif;font-size:4rem;letter-spacing:4px;color:var(--gold);position:relative;z-index:1;}
+.balance-row{display:flex;justify-content:center;gap:3rem;margin-top:1.5rem;}
+.bal-stat{text-align:center;}
+.bal-stat-val{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--green);}
+.bal-stat-label{font-size:.72rem;color:var(--muted);}
+.finance-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;}
+.finance-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.fc-header{padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.fc-title{font-weight:700;font-size:.95rem;}
+.fc-body{padding:1.5rem;}
+.form-group{margin-bottom:1rem;}
+.form-label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:.4rem;font-weight:600;}
+.form-input{width:100%;padding:.75rem 1rem;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Cairo',sans-serif;font-size:.9rem;direction:rtl;}
+.form-input:focus{outline:none;border-color:var(--gold);}
+.form-input[type=number]{direction:ltr;}
+.btn{padding:.75rem 1.2rem;border:none;border-radius:8px;font-family:'Cairo',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;width:100%;margin-top:.5rem;}
+.btn-gold{background:var(--gold);color:#000;}
+.btn-green{background:var(--green);color:#000;}
+.btn-red{background:var(--red-dim);color:var(--red);border:1px solid rgba(239,68,68,.3)!important;}
+.btn-blue{background:rgba(59,130,246,.12);color:var(--blue);border:1px solid rgba(59,130,246,.3)!important;}
+.acc-table{width:100%;border-collapse:collapse;}
+.acc-table th{padding:.6rem 1rem;text-align:right;font-size:.72rem;color:var(--muted);border-bottom:1px solid var(--border);}
+.acc-table td{padding:.8rem 1rem;font-size:.83rem;border-bottom:1px solid var(--border);vertical-align:middle;}
+.acc-table tr:last-child td{border-bottom:none;} .acc-table tr:hover td{background:var(--card);}
+.tx-item{display:flex;align-items:center;gap:1rem;padding:.8rem 0;border-bottom:1px solid var(--border);}
+.tx-item:last-child{border-bottom:none;}
+.tx-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+.tx-icon.in{background:var(--green-dim);} .tx-icon.out{background:var(--red-dim);} .tx-icon.transfer{background:var(--gold-dim);}
+.tx-info{flex:1;}
+.tx-name{font-size:.85rem;font-weight:600;}
+.tx-time{font-size:.72rem;color:var(--muted);margin-top:.1rem;}
+.tx-amount{font-weight:700;font-size:.95rem;}
+.tx-amount.in{color:var(--green);} .tx-amount.out{color:var(--red);} .tx-amount.transfer{color:var(--gold);}
+.search-result{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;margin-top:.8rem;display:none;}
+.search-result.show{display:block;}
+.result-msg{padding:.6rem 1rem;border-radius:6px;font-size:.82rem;margin-top:.8rem;display:none;}
+.result-msg.success{background:var(--green-dim);border:1px solid rgba(16,185,129,.3);color:var(--green);}
+.result-msg.error{background:var(--red-dim);border:1px solid rgba(239,68,68,.3);color:var(--red);}
+.result-msg.show{display:block;}
+::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-thumb{background:var(--border-bright);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-box">
+    <div style="font-size:3.5rem;margin-bottom:1rem">💳</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:4px;color:var(--gold);margin-bottom:.3rem">FINANCE</div>
+    <div style="color:var(--muted);font-size:.85rem;margin-bottom:2rem">حساب الدفع المركزي — المالك فقط</div>
+    <input class="pw-input" type="password" id="financePw" placeholder="••••••••••••" onkeydown="if(event.key==='Enter')checkLogin()">
+    <button class="login-btn" onclick="checkLogin()">🔓 دخول</button>
+    <div class="login-err" id="loginErr">❌ كلمة المرور غير صحيحة</div>
+    <div style="font-size:.75rem;color:var(--muted);margin-top:.5rem" id="attemptsMsg"></div>
+  </div>
+</div>
+
+<div id="financeApp">
+  <header>
+    <div><div class="header-brand">💳 FINANCE — WITTENWEB</div><div style="font-size:.75rem;color:var(--muted)" id="finDate"></div></div>
+    <div><a href="/admin" class="header-link">🛡️ لوحة المالك</a><a href="/" class="header-link">🏪 المتجر</a></div>
+  </header>
+
+  <div class="main">
+    <div class="balance-hero">
+      <div style="font-size:.85rem;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:1rem">الرصيد الإجمالي — حساب الدفع</div>
+      <div class="balance-amount" id="totalBalance">$0.00</div>
+      <div style="color:var(--muted);font-size:.8rem;margin-top:.5rem">يتحدث تلقائياً</div>
+      <div class="balance-row">
+        <div class="bal-stat"><div class="bal-stat-val" id="totalIn">$0</div><div class="bal-stat-label">إجمالي الواردات</div></div>
+        <div class="bal-stat"><div class="bal-stat-val" id="userCount" style="color:var(--blue)">0</div><div class="bal-stat-label">المستخدمون</div></div>
+        <div class="bal-stat"><div class="bal-stat-val" id="totalOut" style="color:var(--red)">$0</div><div class="bal-stat-label">إجمالي المحوّلات</div></div>
+      </div>
+    </div>
+
+    <div class="finance-grid">
+      <div class="finance-card">
+        <div class="fc-header"><span class="fc-title">🔍 بحث عن حساب</span></div>
+        <div class="fc-body">
+          <div class="form-group"><label class="form-label">الاسم أو المعرف أو البريد</label><input class="form-input" type="text" id="searchAccInput" placeholder="اكتب للبحث..."></div>
+          <button class="btn btn-blue" onclick="searchAccount()" style="margin-top:0">🔍 بحث</button>
+          <div class="search-result" id="searchResult">
+            <div style="font-weight:700;margin-bottom:.5rem" id="srName">—</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;font-size:.82rem">
+              <div><div style="color:var(--muted)">المعرف</div><div id="srId" style="font-weight:700;word-break:break-all">—</div></div>
+              <div><div style="color:var(--muted)">البريد</div><div id="srEmail" style="font-weight:700">—</div></div>
+              <div><div style="color:var(--muted)">الرصيد</div><div id="srBal" style="font-weight:700;color:var(--gold)">—</div></div>
+              <div><div style="color:var(--muted)">المنتجات</div><div id="srProds" style="font-weight:700">—</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="finance-card">
+        <div class="fc-header"><span class="fc-title">💸 تحويل رصيد</span></div>
+        <div class="fc-body">
+          <div class="form-group"><label class="form-label">من (ID أو MAIN)</label><input class="form-input" type="text" id="transferFrom" placeholder="WW-ABC123 أو MAIN" dir="ltr"></div>
+          <div class="form-group"><label class="form-label">إلى (ID)</label><input class="form-input" type="text" id="transferTo" placeholder="WW-XYZ456" dir="ltr"></div>
+          <div class="form-group"><label class="form-label">المبلغ ($)</label><input class="form-input" type="number" id="transferAmt" placeholder="0.00" min="0.01" step="0.01"></div>
+          <button class="btn btn-gold" style="margin-top:0" onclick="doTransfer()">💸 تنفيذ التحويل</button>
+          <div class="result-msg" id="transferMsg"></div>
+        </div>
+      </div>
+
+      <div class="finance-card">
+        <div class="fc-header"><span class="fc-title">⚙️ إدارة رصيد مستخدم</span></div>
+        <div class="fc-body">
+          <div class="form-group"><label class="form-label">معرف الحساب</label><input class="form-input" type="text" id="balMgmtId" placeholder="WW-ABC123" dir="ltr"></div>
+          <div class="form-group"><label class="form-label">مبلغ الإضافة ($)</label><input class="form-input" type="number" id="balAddAmt" placeholder="0.00" step="0.01"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem">
+            <button class="btn btn-green" style="margin-top:0" onclick="addBalance()">➕ إضافة</button>
+            <button class="btn btn-red" style="margin-top:0" onclick="zeroBalance()">🔴 تصفير</button>
+          </div>
+          <div class="result-msg" id="balMgmtMsg"></div>
+        </div>
+      </div>
+
+      <div class="finance-card">
+        <div class="fc-header"><span class="fc-title">🏦 حساب الدفع الرئيسي</span></div>
+        <div class="fc-body">
+          <div style="text-align:center;margin-bottom:1.5rem">
+            <div style="font-size:.78rem;color:var(--muted);margin-bottom:.3rem">الرصيد الحالي</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--gold)" id="mainFinBal">$0.00</div>
+          </div>
+          <div class="form-group"><label class="form-label">إضافة للحساب الرئيسي</label><input class="form-input" type="number" id="mainAddAmt" placeholder="0.00" step="0.01"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem">
+            <button class="btn btn-gold" style="margin-top:0" onclick="addMainBalance()">➕ إضافة</button>
+            <button class="btn btn-red" style="margin-top:0" onclick="zeroMainBalance()">🔴 تصفير</button>
+          </div>
+          <div class="result-msg" id="mainBalMsg"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="finance-card" style="margin-bottom:1.5rem">
+      <div class="fc-header"><span class="fc-title">👥 أرصدة جميع الحسابات</span><span style="font-size:.78rem;color:var(--muted)" id="totalUsersBalance"></span></div>
+      <div style="overflow-x:auto">
+        <table class="acc-table">
+          <thead><tr><th>#</th><th>الاسم</th><th>المعرف</th><th>الرصيد</th><th>المنتجات</th><th>إجراءات</th></tr></thead>
+          <tbody id="allAccountsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="finance-card">
+      <div class="fc-header"><span class="fc-title">📜 سجل المعاملات</span></div>
+      <div style="padding:1rem 1.5rem" id="txList"><div style="color:var(--muted);text-align:center;padding:2rem">لا توجد معاملات</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const FINANCE_PW='Ww$Finance!8Tz3#Qp';
+let finAttempts=0, allUsers=[], allProducts=[], mainBal=0, finData={};
+
+async function api(method,url,body=null){
+  const opts={method,headers:{'Content-Type':'application/json'}};
+  if(body)opts.body=JSON.stringify(body);
+  const r=await fetch(url,opts);return r.json();
+}
+
+window.checkLogin=function(){
+  const pw=document.getElementById('financePw').value;
+  if(pw===FINANCE_PW){document.getElementById('loginScreen').style.display='none';document.getElementById('financeApp').style.display='block';init();}
+  else{finAttempts++;document.getElementById('loginErr').style.display='block';document.getElementById('attemptsMsg').textContent=`محاولات: ${finAttempts}/5`;if(finAttempts>=5){document.getElementById('financePw').disabled=true;document.querySelector('.login-btn').disabled=true;}setTimeout(()=>document.getElementById('loginErr').style.display='none',2000);}
+};
+
+async function init(){
+  document.getElementById('finDate').textContent=new Date().toLocaleDateString('ar-SA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  await refresh();
+  setInterval(refresh,15000);
+}
+
+async function refresh(){
+  [allUsers,allProducts,finData]=await Promise.all([api('GET','/api/users'),api('GET','/api/products'),api('GET','/api/finance')]);
+  mainBal=finData.balance||0;
+  document.getElementById('totalBalance').textContent='$'+mainBal.toFixed(2);
+  document.getElementById('mainFinBal').textContent='$'+mainBal.toFixed(2);
+  document.getElementById('totalIn').textContent='$'+(finData.total_in||0).toFixed(2);
+  document.getElementById('totalOut').textContent='$'+(finData.total_out||0).toFixed(2);
+  document.getElementById('userCount').textContent=allUsers.length;
+  const totalUserBal=allUsers.reduce((s,u)=>s+(u.platform_balance||0),0);
+  document.getElementById('totalUsersBalance').textContent=`أرصدة المستخدمين: $${totalUserBal.toFixed(2)}`;
+  renderAccounts();
+}
+
+function renderAccounts(){
+  const tb=document.getElementById('allAccountsBody');
+  if(!allUsers.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:2rem">لا يوجد مستخدمون</td></tr>';return;}
+  tb.innerHTML=allUsers.map((u,i)=>{
+    const prods=allProducts.filter(p=>p.seller_id===u.id).length;
+    const bal=u.platform_balance||0;
+    return`<tr>
+      <td style="color:var(--muted)">${i+1}</td>
+      <td style="font-weight:600">${u.first_name||''} ${u.last_name||''}</td>
+      <td><code style="font-size:.7rem;color:var(--muted)">${(u.id||'').substring(0,16)}...</code></td>
+      <td style="color:${bal>0?'var(--gold)':'var(--muted)'};font-weight:700">$${bal.toFixed(2)}</td>
+      <td>${prods}</td>
+      <td>
+        <button onclick="quickZero('${u.id}')" style="padding:.25rem .6rem;background:var(--red-dim);border:1px solid rgba(239,68,68,.3);color:var(--red);border-radius:4px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:.72rem">تصفير</button>
+        <button onclick="quickFill('${u.id}')" style="padding:.25rem .6rem;background:var(--green-dim);border:1px solid rgba(16,185,129,.3);color:var(--green);border-radius:4px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:.72rem;margin-right:.3rem">+إضافة</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+window.searchAccount=function(){
+  const q=document.getElementById('searchAccInput').value.trim().toLowerCase();
+  const u=allUsers.find(x=>(x.first_name+' '+x.last_name).toLowerCase().includes(q)||(x.id||'').toLowerCase().includes(q)||(x.email||'').toLowerCase().includes(q));
+  const res=document.getElementById('searchResult');
+  if(!u){res.className='search-result show';res.innerHTML='<div style="color:var(--red)">لم يتم العثور على الحساب</div>';return;}
+  document.getElementById('srName').textContent=(u.first_name||'')+' '+(u.last_name||'');
+  document.getElementById('srId').textContent=u.id;
+  document.getElementById('srEmail').textContent=u.email||'—';
+  document.getElementById('srBal').textContent='$'+(u.platform_balance||0).toFixed(2);
+  document.getElementById('srProds').textContent=allProducts.filter(p=>p.seller_id===u.id).length;
+  res.className='search-result show';
+};
+
+window.doTransfer=async function(){
+  const from=document.getElementById('transferFrom').value.trim();
+  const to=document.getElementById('transferTo').value.trim();
+  const amt=parseFloat(document.getElementById('transferAmt').value);
+  const msg=document.getElementById('transferMsg');
+  if(!from||!to||!amt){showMsg(msg,'أدخل جميع البيانات','error');return;}
+  const res=await api('POST','/api/finance/transfer',{from,to,amount:amt});
+  if(res.success){showMsg(msg,`✅ تم التحويل $${amt.toFixed(2)}`,'success');await refresh();}
+  else showMsg(msg,'❌ '+(res.error||'فشل'),'error');
+};
+
+window.addBalance=async function(){
+  const uid=document.getElementById('balMgmtId').value.trim();
+  const amt=parseFloat(document.getElementById('balAddAmt').value);
+  const msg=document.getElementById('balMgmtMsg');
+  if(!uid||!amt){showMsg(msg,'أدخل المعرف والمبلغ','error');return;}
+  const res=await api('POST','/api/finance/add',{uid,amount:amt});
+  if(res.success){showMsg(msg,`✅ تم إضافة $${amt.toFixed(2)}`,'success');await refresh();}
+  else showMsg(msg,'❌ '+(res.error||'فشل'),'error');
+};
+
+window.zeroBalance=async function(){
+  const uid=document.getElementById('balMgmtId').value.trim();
+  const msg=document.getElementById('balMgmtMsg');
+  if(!uid){showMsg(msg,'أدخل المعرف','error');return;}
+  const res=await api('POST','/api/finance/zero',{uid});
+  if(res.success){showMsg(msg,'✅ تم التصفير','success');await refresh();}
+  else showMsg(msg,'❌ فشل','error');
+};
+
+window.addMainBalance=async function(){
+  const amt=parseFloat(document.getElementById('mainAddAmt').value);
+  const msg=document.getElementById('mainBalMsg');
+  if(!amt){showMsg(msg,'أدخل مبلغاً','error');return;}
+  const res=await api('POST','/api/finance/add',{uid:'MAIN',amount:amt});
+  if(res.success){showMsg(msg,`✅ تم إضافة $${amt.toFixed(2)}`,'success');await refresh();}
+};
+
+window.zeroMainBalance=async function(){
+  const msg=document.getElementById('mainBalMsg');
+  const res=await api('POST','/api/finance/zero',{uid:'MAIN'});
+  if(res.success){showMsg(msg,'✅ تم التصفير','success');await refresh();}
+};
+
+window.quickZero=async function(uid){
+  await api('POST','/api/users/'+uid+'/zero');
+  await refresh();
+};
+window.quickFill=function(uid){document.getElementById('balMgmtId').value=uid;document.getElementById('balAddAmt').focus();};
+
+function showMsg(el,msg,type){el.textContent=msg;el.className='result-msg show '+type;setTimeout(()=>el.classList.remove('show'),4000);}
+</script>
+</body>
+</html>

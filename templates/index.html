@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WittenWeb | موضة الشباب</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{--black:#0a0a0a;--white:#f5f0eb;--gold:#c9a84c;--gold-light:#e8c97a;--dark:#111;--card-bg:#161616;--border:#2a2a2a;--muted:#777;--danger:#e74c3c;--success:#27ae60;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);min-height:100vh;overflow-x:hidden;}
+.page{display:none;min-height:100vh;} .page.active{display:block;}
+header{position:fixed;top:0;width:100%;z-index:1000;background:rgba(10,10,10,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 2rem;height:70px;display:flex;align-items:center;justify-content:space-between;}
+.logo{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;color:var(--gold);letter-spacing:2px;cursor:pointer;}
+.logo span{color:var(--white);}
+.nav-actions{display:flex;gap:1rem;align-items:center;}
+.btn{padding:.5rem 1.4rem;border-radius:4px;font-family:'Cairo',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;}
+.btn-gold{background:var(--gold);color:var(--black);} .btn-gold:hover{background:var(--gold-light);}
+.btn-outline{background:transparent;border:1px solid var(--gold);color:var(--gold);} .btn-outline:hover{background:var(--gold);color:var(--black);}
+.btn-dark{background:var(--card-bg);border:1px solid var(--border);color:var(--white);} .btn-dark:hover{border-color:var(--gold);color:var(--gold);}
+.cart-btn{position:relative;background:transparent;border:none;color:var(--white);cursor:pointer;padding:.5rem;font-size:1.4rem;}
+.cart-count{position:absolute;top:-4px;right:-4px;background:var(--gold);color:var(--black);border-radius:50%;width:18px;height:18px;font-size:.65rem;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.user-bar{background:rgba(201,168,76,.05);border-bottom:1px solid var(--border);padding:.4rem 2rem;font-size:.8rem;color:var(--muted);display:none;justify-content:space-between;align-items:center;position:fixed;top:70px;width:100%;z-index:999;}
+.user-bar.show{display:flex;} .user-bar .uid{color:var(--gold);font-weight:700;}
+.hero{padding-top:70px;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(201,168,76,.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(201,168,76,.05) 0%,transparent 50%);}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(201,168,76,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.04) 1px,transparent 1px);background-size:60px 60px;}
+.hero-content{position:relative;z-index:1;text-align:center;padding:2rem;animation:fadeUp .8s ease forwards;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.hero-welcome{font-size:.9rem;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-bottom:1.5rem;padding:.4rem 1.2rem;border:1px solid rgba(201,168,76,.3);border-radius:2px;display:inline-block;}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(2.5rem,7vw,6rem);font-weight:900;line-height:1.1;margin-bottom:1.5rem;}
+.hero-title .gold{color:var(--gold);}
+.hero-sub{font-size:1.1rem;color:var(--muted);margin-bottom:3rem;max-width:500px;margin-left:auto;margin-right:auto;}
+.hero-cta{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+.btn-large{padding:.9rem 2.5rem;font-size:1rem;border-radius:4px;}
+.section{padding:5rem 2rem;}
+.section-header{text-align:center;margin-bottom:3rem;}
+.section-title{font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:900;margin-bottom:.5rem;}
+.section-title .gold{color:var(--gold);}
+.section-sub{color:var(--muted);}
+.filters{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;margin-bottom:3rem;}
+.filter-btn{padding:.5rem 1.2rem;background:var(--card-bg);border:1px solid var(--border);color:var(--muted);border-radius:4px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:.85rem;transition:all .2s;}
+.filter-btn.active,.filter-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.08);}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem;max-width:1400px;margin:0 auto;}
+.product-card{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;overflow:hidden;cursor:pointer;transition:all .3s ease;position:relative;}
+.product-card:hover{border-color:var(--gold);transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,.4);}
+.product-img{width:100%;height:300px;display:flex;align-items:center;justify-content:center;font-size:4rem;position:relative;overflow:hidden;}
+.product-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.product-badge{position:absolute;top:1rem;right:1rem;background:var(--gold);color:var(--black);font-size:.7rem;font-weight:700;padding:.2rem .6rem;border-radius:3px;text-transform:uppercase;letter-spacing:1px;}
+.seller-badge{position:absolute;top:1rem;left:1rem;background:rgba(10,10,10,.9);border:1px solid var(--border);font-size:.7rem;padding:.2rem .6rem;border-radius:3px;color:var(--muted);}
+.product-info{padding:1.2rem;}
+.product-name{font-size:1rem;font-weight:700;margin-bottom:.3rem;}
+.product-desc{font-size:.8rem;color:var(--muted);margin-bottom:.8rem;line-height:1.5;}
+.product-footer{display:flex;align-items:center;justify-content:space-between;}
+.product-price{font-size:1.2rem;font-weight:900;color:var(--gold);}
+.product-rating{display:flex;gap:2px;}
+.star{color:var(--gold);font-size:.8rem;} .star.empty{color:var(--border);}
+.cart-panel{position:fixed;top:0;left:-420px;height:100vh;width:400px;z-index:1500;background:var(--dark);border-right:1px solid var(--border);transition:left .3s ease;display:flex;flex-direction:column;}
+.cart-panel.open{left:0;}
+.cart-overlay{display:none;position:fixed;inset:0;z-index:1400;background:rgba(0,0,0,.5);}
+.cart-overlay.active{display:block;}
+.cart-header{padding:1.5rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.cart-title{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--gold);}
+.cart-items{flex:1;overflow-y:auto;padding:1rem;}
+.cart-item{display:flex;gap:1rem;padding:1rem;background:var(--card-bg);border-radius:8px;margin-bottom:.8rem;border:1px solid var(--border);}
+.cart-item-img{width:70px;height:80px;background:#1a1a1a;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0;overflow:hidden;}
+.cart-item-img img{width:100%;height:100%;object-fit:cover;}
+.cart-item-info{flex:1;}
+.cart-item-name{font-weight:700;margin-bottom:.3rem;font-size:.9rem;}
+.cart-item-price{color:var(--gold);font-weight:700;}
+.cart-item-note{font-size:.75rem;color:var(--muted);margin-top:.3rem;}
+.cart-item-remove{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.2rem;transition:color .2s;}
+.cart-item-remove:hover{color:var(--danger);}
+.cart-footer{padding:1.5rem;border-top:1px solid var(--border);}
+.cart-total{display:flex;justify-content:space-between;font-size:1.2rem;font-weight:700;margin-bottom:1rem;}
+.cart-total-price{color:var(--gold);}
+.empty-cart{text-align:center;padding:3rem 1rem;color:var(--muted);}
+.empty-cart-icon{font-size:3rem;margin-bottom:1rem;}
+.modal-overlay{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:1rem;}
+.modal-overlay.active{display:flex;}
+.modal{background:var(--dark);border:1px solid var(--border);border-radius:12px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;animation:fadeUp .3s ease;}
+.modal-header{padding:1.5rem 1.5rem 0;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding-bottom:1rem;}
+.modal-title{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--gold);}
+.modal-close{background:none;border:none;color:var(--muted);font-size:1.5rem;cursor:pointer;} .modal-close:hover{color:var(--white);}
+.modal-body{padding:1.5rem;}
+.product-detail-img{width:100%;height:350px;border-radius:8px;overflow:hidden;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:center;font-size:6rem;}
+.product-detail-img img{width:100%;height:100%;object-fit:cover;}
+.price-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;}
+.price-big{font-size:2rem;font-weight:900;color:var(--gold);}
+.note-section{margin-top:1.5rem;}
+.note-label{font-size:.9rem;color:var(--muted);margin-bottom:.5rem;}
+.note-input{width:100%;padding:.8rem 1rem;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;color:var(--white);font-family:'Cairo',sans-serif;font-size:.9rem;resize:vertical;min-height:100px;direction:rtl;}
+.note-input:focus{outline:none;border-color:var(--gold);}
+.modal-actions{display:flex;gap:1rem;margin-top:1.5rem;}
+.modal-actions .btn{flex:1;text-align:center;padding:.8rem;}
+.auth-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;padding-top:90px;position:relative;}
+.auth-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(201,168,76,.06) 0%,transparent 60%);}
+.auth-card{position:relative;z-index:1;background:var(--dark);border:1px solid var(--border);border-radius:12px;padding:2.5rem;width:100%;max-width:460px;animation:fadeUp .5s ease;}
+.auth-logo{text-align:center;margin-bottom:2rem;}
+.auth-logo .logo-text{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:var(--gold);}
+.auth-title{font-size:1.5rem;font-weight:700;margin-bottom:.3rem;text-align:center;}
+.auth-sub{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:2rem;line-height:1.6;}
+.form-group{margin-bottom:1.2rem;}
+.form-label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:.5rem;font-weight:600;}
+.form-input{width:100%;padding:.8rem 1rem;background:var(--card-bg);border:1px solid var(--border);border-radius:6px;color:var(--white);font-family:'Cairo',sans-serif;font-size:.95rem;transition:border-color .2s;direction:rtl;}
+.form-input:focus{outline:none;border-color:var(--gold);}
+.form-input::placeholder{color:var(--muted);}
+.form-row{display:flex;gap:1rem;} .form-row .form-group{flex:1;}
+.auth-actions{margin-top:1.5rem;}
+.auth-switch{text-align:center;margin-top:1.5rem;font-size:.85rem;color:var(--muted);}
+.auth-link{color:var(--gold);cursor:pointer;font-weight:700;} .auth-link:hover{text-decoration:underline;}
+.twofa-section{background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.2);border-radius:8px;padding:1.2rem;margin-bottom:1.2rem;}
+.twofa-title{font-size:.85rem;font-weight:700;color:var(--gold);margin-bottom:.5rem;}
+.alert{padding:.8rem 1rem;border-radius:6px;font-size:.85rem;margin-bottom:1rem;}
+.alert-info{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);color:var(--gold-light);}
+.alert-danger{background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);color:#e74c3c;}
+.alert-success{background:rgba(39,174,96,.08);border:1px solid rgba(39,174,96,.2);color:var(--success);}
+.sell-page{padding-top:70px;padding:90px 2rem 4rem;max-width:1400px;margin:0 auto;}
+.sell-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;}
+.sell-title{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;}
+.sell-title .gold{color:var(--gold);}
+.add-product-btn{width:60px;height:60px;border-radius:50%;background:var(--gold);color:var(--black);font-size:2rem;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(201,168,76,.3);transition:all .2s;}
+.add-product-btn:hover{transform:scale(1.1) rotate(90deg);background:var(--gold-light);}
+.my-products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1.5rem;}
+.my-product-card{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;overflow:hidden;position:relative;}
+.my-product-actions{position:absolute;top:.8rem;left:.8rem;}
+.my-prod-action-btn{width:30px;height:30px;border-radius:50%;background:rgba(10,10,10,.9);border:1px solid var(--border);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.8rem;transition:all .2s;}
+.my-prod-action-btn:hover{color:var(--danger);border-color:var(--danger);}
+.seller-rating-bar{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:1rem 1.5rem;margin-bottom:2rem;display:flex;align-items:center;gap:2rem;}
+.upload-zone{border:2px dashed var(--border);border-radius:8px;padding:2rem;text-align:center;cursor:pointer;margin-bottom:1.2rem;transition:all .2s;position:relative;}
+.upload-zone:hover{border-color:var(--gold);}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.upload-icon{font-size:2.5rem;margin-bottom:.5rem;}
+.upload-text{font-size:.85rem;color:var(--muted);}
+.upload-preview{width:100%;height:200px;object-fit:cover;border-radius:6px;display:none;}
+.payment-info{background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.2);border-radius:8px;padding:1.2rem;margin-bottom:1.2rem;}
+.payment-row{display:flex;justify-content:space-between;padding:.4rem 0;font-size:.9rem;}
+.payment-row.total{border-top:1px solid var(--border);margin-top:.5rem;padding-top:.8rem;font-size:1.1rem;font-weight:700;}
+.payment-row .gold{color:var(--gold);}
+.divider{height:1px;background:var(--border);margin:1.5rem 0;}
+.secret-page{min-height:100vh;background:#050505;display:flex;align-items:center;justify-content:center;flex-direction:column;}
+.secret-content{text-align:center;padding:2rem;animation:fadeUp .6s ease;}
+.notification{position:fixed;bottom:2rem;right:2rem;z-index:3000;background:var(--dark);border:1px solid var(--border);border-radius:8px;padding:1rem 1.5rem;min-width:280px;max-width:350px;animation:fadeUp .3s ease;box-shadow:0 10px 40px rgba(0,0,0,.5);display:none;}
+.notification.success{border-color:var(--success);} .notification.error{border-color:var(--danger);} .notification.gold{border-color:var(--gold);}
+.notif-title{font-weight:700;margin-bottom:.3rem;}
+.notif-msg{font-size:.85rem;color:var(--muted);}
+::-webkit-scrollbar{width:6px;} ::-webkit-scrollbar-track{background:var(--black);} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:768px){.products-grid{grid-template-columns:repeat(2,1fr);gap:1rem;}.cart-panel{width:100%;left:-100%;}.hero-cta{flex-direction:column;align-items:center;}header{padding:0 1rem;}.logo{font-size:1.3rem;}}
+@media(max-width:480px){.products-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<header id="mainHeader">
+  <div class="logo" onclick="goHome()">Witten<span>Web</span></div>
+  <div class="nav-actions" id="navActions">
+    <button class="btn btn-outline" onclick="showPage('login')">تسجيل الدخول</button>
+    <button class="btn btn-gold" onclick="showPage('register')">إنشاء حساب</button>
+    <button class="cart-btn" onclick="toggleCart()">🛒<span class="cart-count" id="cartCount">0</span></button>
+  </div>
+</header>
+
+<div class="user-bar" id="userBar">
+  <span>مرحباً <strong id="userNameBar"></strong> | ID: <span class="uid" id="userIdBar"></span></span>
+  <div style="display:flex;gap:.8rem;align-items:center">
+    <button class="btn btn-dark" style="padding:.3rem .8rem;font-size:.8rem" onclick="showPage('sell')">🏪 متجري</button>
+    <button class="btn btn-dark" style="padding:.3rem .8rem;font-size:.8rem" onclick="logout()">خروج</button>
+  </div>
+</div>
+
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-header">
+    <span class="cart-title">🛒 سلة المشتريات</span>
+    <button class="modal-close" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems"><div class="empty-cart"><div class="empty-cart-icon">🛒</div><p>السلة فارغة</p></div></div>
+  <div class="cart-footer">
+    <div class="cart-total"><span>الإجمالي</span><span class="cart-total-price" id="cartTotal">$0.00</span></div>
+    <button class="btn btn-gold" style="width:100%;padding:.9rem" onclick="openCheckout()">متابعة الدفع</button>
+  </div>
+</div>
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <section class="hero">
+    <div class="hero-bg"></div><div class="hero-grid"></div>
+    <div class="hero-content">
+      <div class="hero-welcome">مرحبا بكم في WittenWeb</div>
+      <h1 class="hero-title">أناقة<br><span class="gold">لا حدود لها</span></h1>
+      <p class="hero-sub">اكتشف أكثر من 160 بدلة عصرية مختارة بعناية لرجل الموضة الحديث</p>
+      <div class="hero-cta">
+        <button class="btn btn-gold btn-large" onclick="scrollToShop()">🔥 تسوق الآن</button>
+        <button class="btn btn-outline btn-large" onclick="showPage('register')">✨ انضم إلينا</button>
+      </div>
+    </div>
+  </section>
+  <section class="section" id="shopSection">
+    <div class="section-header">
+      <h2 class="section-title">مجموعة <span class="gold">البدلات</span></h2>
+      <p class="section-sub">أكثر من 160 تصميم فريد</p>
+    </div>
+    <div class="filters" id="filters">
+      <button class="filter-btn active" onclick="filterProducts('all',this)">الكل</button>
+      <button class="filter-btn" onclick="filterProducts('classic',this)">كلاسيك</button>
+      <button class="filter-btn" onclick="filterProducts('modern',this)">عصري</button>
+      <button class="filter-btn" onclick="filterProducts('casual',this)">كاجوال</button>
+      <button class="filter-btn" onclick="filterProducts('formal',this)">رسمي</button>
+      <button class="filter-btn" onclick="filterProducts('sport',this)">رياضي</button>
+      <button class="filter-btn" onclick="filterProducts('user',this)">من البائعين</button>
+    </div>
+    <div class="products-grid" id="productsGrid"></div>
+  </section>
+</div>
+
+<!-- LOGIN -->
+<div class="page" id="page-login">
+  <div class="auth-page"><div class="auth-bg"></div>
+    <div class="auth-card">
+      <div class="auth-logo"><div class="logo-text">WittenWeb</div></div>
+      <h2 class="auth-title">تسجيل الدخول</h2>
+      <p class="auth-sub">أدخل بيانات حسابك للمتابعة</p>
+      <div id="loginAlert"></div>
+      <div class="form-group"><label class="form-label">البريد الإلكتروني</label><input class="form-input" type="email" id="loginEmail" placeholder="example@email.com" dir="ltr"></div>
+      <div class="form-group"><label class="form-label">كلمة المرور</label><input class="form-input" type="password" id="loginPassword" placeholder="••••••••" dir="ltr"></div>
+      <div class="twofa-section" id="twoFALogin" style="display:none">
+        <div class="twofa-title">🔐 التحقق بخطوتين</div>
+        <input class="form-input" type="text" id="twoFACodeInput" placeholder="000000" maxlength="6" dir="ltr" style="text-align:center;letter-spacing:6px;font-size:1.2rem;margin-top:.8rem">
+        <div style="font-size:.75rem;color:var(--muted);margin-top:.5rem;text-align:center">الكود: <span id="twoFACodeDisplay" style="color:var(--gold);font-weight:700"></span></div>
+      </div>
+      <div class="auth-actions"><button class="btn btn-gold" style="width:100%;padding:.9rem" onclick="doLogin()">دخول</button></div>
+      <div class="auth-switch">ليس لديك حساب؟ <span class="auth-link" onclick="showPage('register')">إنشاء حساب</span></div>
+      <div style="margin-top:1rem;text-align:center"><span class="auth-link" onclick="showPage('home')" style="font-size:.85rem;color:var(--muted)">← العودة للمتجر</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTER -->
+<div class="page" id="page-register">
+  <div class="auth-page"><div class="auth-bg"></div>
+    <div class="auth-card">
+      <div class="auth-logo"><div class="logo-text">WittenWeb</div></div>
+      <h2 class="auth-title">إنشاء حساب</h2>
+      <div class="alert alert-info">🔒 أدخل بيانات وهمية واحتفظ بها — لن تتمكن من الدخول ببيانات مختلفة</div>
+      <div id="regAlert"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">الاسم الأول</label><input class="form-input" type="text" id="regFirst" placeholder="محمد"></div>
+        <div class="form-group"><label class="form-label">الاسم الأخير</label><input class="form-input" type="text" id="regLast" placeholder="العمري"></div>
+      </div>
+      <div class="form-group"><label class="form-label">البريد الإلكتروني</label><input class="form-input" type="email" id="regEmail" placeholder="example@email.com" dir="ltr"></div>
+      <div class="form-group"><label class="form-label">كلمة المرور</label><input class="form-input" type="password" id="regPassword" placeholder="8 أحرف على الأقل" dir="ltr"></div>
+      <div class="form-group"><label class="form-label">تأكيد كلمة المرور</label><input class="form-input" type="password" id="regPasswordConfirm" placeholder="أعد الإدخال" dir="ltr"></div>
+      <div class="auth-actions"><button class="btn btn-gold" style="width:100%;padding:.9rem" onclick="doRegister()">إنشاء الحساب</button></div>
+      <div class="auth-switch">لديك حساب؟ <span class="auth-link" onclick="showPage('login')">تسجيل الدخول</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- SELL -->
+<div class="page" id="page-sell">
+  <div class="sell-page">
+    <div class="sell-header">
+      <div><h2 class="sell-title">متجري <span class="gold">الشخصي</span></h2><p style="color:var(--muted);font-size:.9rem;margin-top:.3rem">أضف منتجاتك وابدأ البيع</p></div>
+      <button class="add-product-btn" onclick="openAddProduct()">+</button>
+    </div>
+    <div class="seller-rating-bar">
+      <div><div style="font-size:.8rem;color:var(--muted)">تقييم التاجر</div><div style="font-size:1.8rem;font-weight:700;color:var(--gold)" id="sellerScore">—</div></div>
+      <div style="flex:1"></div>
+      <div style="text-align:left"><div style="font-size:.8rem;color:var(--muted)">رصيد المنصة</div><div style="font-size:1.4rem;font-weight:700;color:var(--gold)" id="sellerBalance">$0.00</div><div style="font-size:.7rem;color:var(--muted)">يُحوّل للتاجر بعد مراجعة المالك</div></div>
+    </div>
+    <div class="my-products-grid" id="myProductsGrid"></div>
+  </div>
+</div>
+
+<!-- SECRET -->
+<div class="page" id="page-secret">
+  <div class="secret-page">
+    <div class="secret-content">
+      <div style="font-size:4rem;margin-bottom:1rem">🔐</div>
+      <div style="font-family:'Playfair Display',serif;font-size:2.5rem;color:var(--gold);margin-bottom:1rem">لوحة المالك</div>
+      <p style="color:var(--muted);margin-bottom:2rem">صفحة سرية — للمالك فقط</p>
+      <div id="ownerStats" style="max-width:400px;width:100%;margin-bottom:2rem"></div>
+      <a href="/admin" style="padding:.9rem 2.5rem;background:var(--gold);color:var(--black);border-radius:4px;font-weight:700;text-decoration:none;">🛡️ فتح لوحة التحكم</a>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="productModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title" id="modalProductName"></span><button class="modal-close" onclick="closeModal('productModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="product-detail-img" id="modalProductImg"></div>
+      <div class="price-row">
+        <div><div style="font-size:.8rem;color:var(--muted);margin-bottom:.3rem">السعر</div><div class="price-big" id="modalProductPrice">$0</div></div>
+        <div id="modalRating"></div>
+      </div>
+      <p id="modalProductDesc" style="color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:1rem"></p>
+      <div id="modalSellerInfo" style="font-size:.8rem;color:var(--muted);margin-bottom:1rem"></div>
+      <div class="note-section">
+        <div class="note-label">📝 أضف ملاحظة على هذه البدلة</div>
+        <textarea class="note-input" id="productNote" placeholder="اكتب ملاحظتك هنا..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-gold" onclick="addToCart()">🛒 أضف للسلة</button>
+        <button class="btn btn-dark" onclick="closeModal('productModal')">إغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD PRODUCT MODAL -->
+<div class="modal-overlay" id="addProductModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">➕ إضافة منتج</span><button class="modal-close" onclick="closeModal('addProductModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" accept="image/*" onchange="handleImageUpload(event)">
+        <div id="uploadPlaceholder"><div class="upload-icon">📸</div><div class="upload-text">اضغط لرفع صورة</div></div>
+        <img id="uploadPreview" class="upload-preview" alt="">
+      </div>
+      <div class="form-group"><label class="form-label">اسم المنتج</label><input class="form-input" type="text" id="newProdName" placeholder="بدلة كلاسيك رجالية"></div>
+      <div class="form-group"><label class="form-label">السعر ($)</label><input class="form-input" type="number" id="newProdPrice" placeholder="89" min="1" dir="ltr"></div>
+      <div class="form-group"><label class="form-label">الوصف</label><textarea class="form-input" id="newProdDesc" placeholder="وصف مختصر..." style="resize:vertical;min-height:80px"></textarea></div>
+      <div class="form-group"><label class="form-label">الفئة</label>
+        <select class="form-input" id="newProdCat"><option value="classic">كلاسيك</option><option value="modern">عصري</option><option value="casual">كاجوال</option><option value="formal">رسمي</option><option value="sport">رياضي</option></select>
+      </div>
+      <button class="btn btn-gold" style="width:100%;padding:.9rem;margin-top:.5rem" onclick="saveProduct()">نشر المنتج</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div class="modal-overlay" id="checkoutModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">💳 إتمام الدفع</span><button class="modal-close" onclick="closeModal('checkoutModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="payment-info" id="checkoutSummary"></div>
+      <div class="form-group"><label class="form-label">رقم البطاقة</label><input class="form-input" type="text" id="cardNum" placeholder="0000 0000 0000 0000" maxlength="19" dir="ltr" oninput="formatCard(this)"></div>
+      <div style="display:flex;gap:1rem">
+        <div class="form-group" style="flex:1"><label class="form-label">تاريخ الانتهاء</label><input class="form-input" type="text" id="cardExp" placeholder="MM/YY" maxlength="5" dir="ltr"></div>
+        <div class="form-group" style="flex:1"><label class="form-label">CVV</label><input class="form-input" type="text" id="cardCVV" placeholder="123" maxlength="3" dir="ltr"></div>
+      </div>
+      <div class="alert alert-info" style="font-size:.8rem">💡 موقع تجريبي — لن يتم خصم أي مبالغ</div>
+      <button class="btn btn-gold" style="width:100%;padding:.9rem" onclick="processPayment()">✅ تأكيد الدفع</button>
+    </div>
+  </div>
+</div>
+
+<div id="notificationEl" class="notification"><div class="notif-title" id="notifTitle"></div><div class="notif-msg" id="notifMsg"></div></div>
+
+<script>
+const SECRET_CODE = 'hgduggvd827*hhrhhej';
+const EMOJIS  = ['👔','🧥','🥻','🎩','🧣','🧤','👗','🪖','👒','🧦'];
+const COLORS  = ['#1a1a2e','#16213e','#0f3460','#1b4332','#3d1a78','#4a1942','#5c1a1a','#2d3436','#1e272e','#2f3640'];
+const CATS    = {classic:'كلاسيك',modern:'عصري',casual:'كاجوال',formal:'رسمي',sport:'رياضي'};
+const SUITS   = ['بدلة كلاسيك أنيقة','بدلة عصرية بحزام','طقم رسمي ثلاثي','بدلة كاجوال مريحة','بدلة رياضية عالية الأداء','سترة رجالية راقية','بدلة حفلات فاخرة','طقم قطيفة ملكي','بدلة عمل متميزة','طقم كتان فاخر','بدلة سهرة مميزة','جاكيت جلد أنيق','طقم قصب فاخر','بدلة إيطالية أصيلة','سترة بريطانية كلاسيك'];
+const CAT_LIST= ['classic','modern','casual','formal','sport'];
+
+let allProducts=[], userProducts=[], cart=[], currentProduct=null, currentUser=null;
+let loginStep=1, loginTempUser=null, uploadedImageData=null;
+
+// ── API Helper ────────────────────────────────────────────
+async function api(method, url, body=null){
+  const opts={method,headers:{'Content-Type':'application/json'}};
+  if(body) opts.body=JSON.stringify(body);
+  const r=await fetch(url,opts);
+  return r.json();
+}
+
+// ── Init ──────────────────────────────────────────────────
+window.onload=async function(){
+  generateStaticProducts();
+  const session=localStorage.getItem('ww_session');
+  if(session){currentUser=JSON.parse(session);updateUIForUser();}
+  await loadUserProducts();
+  renderProducts(allProducts);
+};
+
+function generateStaticProducts(){
+  allProducts=[];
+  for(let i=0;i<162;i++){
+    const cat=CAT_LIST[i%CAT_LIST.length];
+    const base=SUITS[i%SUITS.length];
+    const num=Math.floor(i/SUITS.length);
+    allProducts.push({
+      id:'static_'+i,
+      name:base+(num>0?' #'+(num+1):''),
+      category:cat,
+      price:49+Math.floor(Math.random()*200),
+      rating:parseFloat((3.5+Math.random()*1.5).toFixed(1)),
+      reviews:Math.floor(10+Math.random()*200),
+      emoji:EMOJIS[i%EMOJIS.length],
+      color:COLORS[i%COLORS.length],
+      description:'تصميم فاخر من مجموعة '+CATS[cat]+' — قماش عالي الجودة مناسب لجميع المناسبات.',
+      seller_id:null, seller_name:'WittenWeb', type:'platform', image:null
+    });
+  }
+}
+
+async function loadUserProducts(){
+  const res=await api('GET','/api/products');
+  userProducts=Array.isArray(res)?res:[];
+}
+
+// ── Navigation ────────────────────────────────────────────
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name)?.classList.add('active');
+  window.scrollTo(0,0);
+  if(name==='sell'){if(!currentUser){showPage('login');return;}renderMyProducts();}
+}
+function goHome(){showPage('home');}
+function scrollToShop(){showPage('home');setTimeout(()=>document.getElementById('shopSection').scrollIntoView({behavior:'smooth'}),100);}
+
+// ── Products ──────────────────────────────────────────────
+function renderProducts(products){
+  const combined=[...products,...userProducts.map(p=>({...p,type:'user'}))];
+  const grid=document.getElementById('productsGrid');
+  if(!combined.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:4rem">لا توجد منتجات</div>';return;}
+  grid.innerHTML=combined.map(p=>`
+    <div class="product-card" onclick="openProduct('${p.id}','${p.type||'platform'}')">
+      <div class="product-img" style="background:linear-gradient(135deg,${p.color||'#1a1a1a'},#0a0a0a)">
+        ${p.image?`<img src="${p.image}" alt="${p.name}">`:''}
+        <span style="position:relative;z-index:1">${p.emoji||'👔'}</span>
+      </div>
+      ${p.type==='user'?`<div class="seller-badge">🏪 ${p.seller_name||'بائع'}</div>`:`<div class="product-badge">${CATS[p.category]||'بدلة'}</div>`}
+      <div class="product-info">
+        <div class="product-name">${p.name}</div>
+        <div class="product-desc">${(p.description||'').substring(0,70)}...</div>
+        <div class="product-footer">
+          <div class="product-price">$${p.price}</div>
+          <div class="product-rating">${renderStars(p.rating)}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderStars(r){let h='';for(let i=1;i<=5;i++)h+=`<span class="star${i>r?' empty':''}">★</span>`;return h;}
+
+function filterProducts(cat,btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(cat==='all') renderProducts(allProducts);
+  else if(cat==='user') renderProducts([]);
+  else renderProducts(allProducts.filter(p=>p.category===cat));
+}
+
+function openProduct(id, type){
+  const combined=[...allProducts,...userProducts.map(p=>({...p,type:'user'}))];
+  const p=combined.find(x=>x.id===id);
+  if(!p)return;
+  currentProduct=p;
+  document.getElementById('modalProductName').textContent=p.name;
+  document.getElementById('modalProductPrice').textContent='$'+p.price;
+  document.getElementById('modalProductDesc').textContent=p.description||'';
+  document.getElementById('modalRating').innerHTML=`<div style="text-align:right"><div class="product-rating">${renderStars(p.rating)}</div><div style="font-size:.75rem;color:var(--muted);margin-top:.2rem">${p.reviews||0} تقييم</div></div>`;
+  const imgEl=document.getElementById('modalProductImg');
+  imgEl.style.background=`linear-gradient(135deg,${p.color||'#1a1a1a'},#0a0a0a)`;
+  imgEl.innerHTML=p.image?`<img src="${p.image}" style="width:100%;height:100%;object-fit:cover">`:`<span>${p.emoji||'👔'}</span>`;
+  document.getElementById('modalSellerInfo').innerHTML=p.type==='user'?`🏪 البائع: <strong style="color:var(--gold)">${p.seller_name||'بائع'}</strong>`:`✅ منتج موثق من <strong style="color:var(--gold)">WittenWeb</strong>`;
+  document.getElementById('productNote').value='';
+  openModal('productModal');
+}
+
+// ── Cart ──────────────────────────────────────────────────
+function addToCart(){
+  if(!currentProduct)return;
+  const note=document.getElementById('productNote').value.trim();
+  if(note===SECRET_CODE){closeModal('productModal');showSecretPage();return;}
+  if(note) api('POST','/api/notes',{product:currentProduct.name,note,from:currentUser?.id||'زائر'});
+  const ex=cart.find(i=>i.id===currentProduct.id);
+  if(ex){ex.qty++;if(note)ex.note=note;}
+  else cart.push({...currentProduct,qty:1,note});
+  updateCartUI();
+  closeModal('productModal');
+  notify('✅ تمت الإضافة',`"${currentProduct.name}" أُضيف إلى السلة`,'success');
+}
+function updateCartUI(){
+  const count=cart.reduce((s,i)=>s+i.qty,0);
+  document.getElementById('cartCount').textContent=count;
+  const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  document.getElementById('cartTotal').textContent='$'+total.toFixed(2);
+  const el=document.getElementById('cartItems');
+  if(!cart.length){el.innerHTML='<div class="empty-cart"><div class="empty-cart-icon">🛒</div><p>السلة فارغة</p></div>';return;}
+  el.innerHTML=cart.map((item,idx)=>`
+    <div class="cart-item">
+      <div class="cart-item-img" style="background:linear-gradient(135deg,${item.color||'#1a1a1a'},#0a0a0a)">
+        ${item.image?`<img src="${item.image}" alt="">`:(item.emoji||'👔')}
+      </div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-price">$${item.price} × ${item.qty}</div>
+        ${item.note?`<div class="cart-item-note">📝 ${item.note}</div>`:''}
+      </div>
+      <button class="cart-item-remove" onclick="removeFromCart(${idx})">✕</button>
+    </div>`).join('');
+}
+function removeFromCart(idx){cart.splice(idx,1);updateCartUI();}
+function toggleCart(){document.getElementById('cartPanel').classList.toggle('open');document.getElementById('cartOverlay').classList.toggle('active');}
+
+function openCheckout(){
+  if(!cart.length)return;
+  if(!currentUser){notify('🔐 يجب تسجيل الدخول','','error');setTimeout(()=>showPage('login'),1200);return;}
+  const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const fee=(total*.028).toFixed(2);
+  document.getElementById('checkoutSummary').innerHTML=`
+    <div class="payment-row"><span>عدد المنتجات</span><span>${cart.length}</span></div>
+    <div class="payment-row"><span>المجموع</span><span>$${total.toFixed(2)}</span></div>
+    <div class="payment-row"><span style="font-size:.8rem;color:var(--muted)">رسوم المنصة (2.8%)</span><span style="font-size:.8rem;color:var(--muted)">$${fee}</span></div>
+    <div class="payment-row total"><span>الإجمالي</span><span class="gold">$${total.toFixed(2)}</span></div>`;
+  toggleCart();
+  openModal('checkoutModal');
+}
+
+async function processPayment(){
+  const cardNum=document.getElementById('cardNum').value.replace(/\s/g,'');
+  const exp=document.getElementById('cardExp').value;
+  const cvv=document.getElementById('cardCVV').value;
+  if(cardNum.length<13||!exp||cvv.length<3){notify('❌ خطأ','أدخل بيانات البطاقة','error');return;}
+  const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const res=await api('POST','/api/checkout',{
+    buyer_id:currentUser.id,
+    buyer_name:currentUser.first_name||currentUser.name||'',
+    items:cart.map(i=>({id:i.id,name:i.name,price:i.price,qty:i.qty})),
+    total
+  });
+  if(res.success){
+    cart=[];updateCartUI();
+    closeModal('checkoutModal');
+    notify('✅ تم الدفع!','المبلغ في حساب المنصة — سيُحوَّل للتاجر بعد مراجعة المالك','gold');
+  } else notify('❌ خطأ',res.error||'فشل الدفع','error');
+}
+
+// ── Auth ──────────────────────────────────────────────────
+async function doRegister(){
+  const first=document.getElementById('regFirst').value.trim();
+  const last=document.getElementById('regLast').value.trim();
+  const email=document.getElementById('regEmail').value.trim();
+  const pw=document.getElementById('regPassword').value;
+  const pwc=document.getElementById('regPasswordConfirm').value;
+  const alertEl=document.getElementById('regAlert');
+  if(!first||!last||!email||!pw){alertEl.innerHTML='<div class="alert alert-danger">⚠️ يرجى ملء جميع الحقول</div>';return;}
+  if(pw!==pwc){alertEl.innerHTML='<div class="alert alert-danger">⚠️ كلمة المرور غير متطابقة</div>';return;}
+  const res=await api('POST','/api/register',{firstName:first,lastName:last,email,password:pw});
+  if(res.error){alertEl.innerHTML=`<div class="alert alert-danger">⚠️ ${res.error}</div>`;return;}
+  alertEl.innerHTML=`<div class="alert alert-success">✅ تم إنشاء حسابك!<br><strong>معرفك:</strong> <span style="color:var(--gold)">${res.uid}</span><br><strong>كود 2FA:</strong> <span style="color:var(--gold)">${res.twoFA}</span><br><small>احتفظ بهذه المعلومات</small></div>`;
+  setTimeout(async()=>{
+    const login=await api('POST','/api/login',{email,password:pw});
+    if(login.step===2){
+      const full=await api('POST','/api/login',{email,password:pw,twoFA:res.twoFA});
+      if(full.success){currentUser=full.user;localStorage.setItem('ww_session',JSON.stringify(full.user));updateUIForUser();showPage('home');notify('🎉 مرحباً '+first,'','gold');}
+    }
+  },3000);
+}
+
+async function doLogin(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const pw=document.getElementById('loginPassword').value;
+  const alertEl=document.getElementById('loginAlert');
+  if(loginStep===1){
+    if(!email||!pw){alertEl.innerHTML='<div class="alert alert-danger">⚠️ أدخل البيانات</div>';return;}
+    const res=await api('POST','/api/login',{email,password:pw});
+    if(res.error){alertEl.innerHTML=`<div class="alert alert-danger">❌ ${res.error}</div>`;return;}
+    if(res.step===2){
+      loginTempUser={email,password:pw};
+      loginStep=2;
+      document.getElementById('twoFALogin').style.display='block';
+      document.getElementById('twoFACodeDisplay').textContent=res.twoFA;
+      alertEl.innerHTML='<div class="alert alert-info">🔐 أدخل كود التحقق بخطوتين</div>';
+    }
+  } else {
+    const code=document.getElementById('twoFACodeInput').value.trim();
+    const res=await api('POST','/api/login',{...loginTempUser,twoFA:code});
+    if(res.error){alertEl.innerHTML=`<div class="alert alert-danger">❌ ${res.error}</div>`;return;}
+    currentUser=res.user;
+    localStorage.setItem('ww_session',JSON.stringify(res.user));
+    loginStep=1;loginTempUser=null;
+    document.getElementById('twoFALogin').style.display='none';
+    document.getElementById('twoFACodeInput').value='';
+    document.getElementById('loginEmail').value='';
+    document.getElementById('loginPassword').value='';
+    alertEl.innerHTML='';
+    updateUIForUser();showPage('home');
+    notify('✅ مرحباً '+currentUser.first_name,'تم تسجيل الدخول','success');
+  }
+}
+
+function logout(){
+  currentUser=null;localStorage.removeItem('ww_session');
+  document.getElementById('userBar').classList.remove('show');
+  document.getElementById('navActions').innerHTML=`<button class="btn btn-outline" onclick="showPage('login')">تسجيل الدخول</button><button class="btn btn-gold" onclick="showPage('register')">إنشاء حساب</button><button class="cart-btn" onclick="toggleCart()">🛒<span class="cart-count" id="cartCount">0</span></button>`;
+  showPage('home');notify('👋 إلى اللقاء','تم تسجيل الخروج','success');
+}
+
+function updateUIForUser(){
+  if(!currentUser)return;
+  document.getElementById('userBar').classList.add('show');
+  document.getElementById('userNameBar').textContent=currentUser.first_name||currentUser.name||'';
+  document.getElementById('userIdBar').textContent=currentUser.id;
+  document.getElementById('navActions').innerHTML=`<button class="btn btn-dark" onclick="showPage('sell')">🏪 متجري</button><button class="btn btn-outline" onclick="logout()">خروج</button><button class="cart-btn" onclick="toggleCart()">🛒<span class="cart-count" id="cartCount">0</span></button>`;
+  updateCartUI();
+}
+
+// ── Seller ────────────────────────────────────────────────
+async function renderMyProducts(){
+  if(!currentUser)return;
+  const prods=await api('GET','/api/products');
+  const mine=Array.isArray(prods)?prods.filter(p=>p.seller_id===currentUser.id):[];
+  const user=await api('GET','/api/users/'+currentUser.id);
+  document.getElementById('sellerScore').textContent=user.seller_rating||'4.5';
+  document.getElementById('sellerBalance').textContent='$'+(user.platform_balance||0).toFixed(2);
+  const grid=document.getElementById('myProductsGrid');
+  if(!mine.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:4rem;color:var(--muted)"><div style="font-size:3rem;margin-bottom:1rem">📦</div><p>اضغط + لإضافة أول منتج</p></div>';return;}
+  grid.innerHTML=mine.map(p=>`
+    <div class="my-product-card">
+      <div class="product-img" style="background:linear-gradient(135deg,${p.color||'#1a1a1a'},#0a0a0a);height:200px">
+        ${p.image?`<img src="${p.image}" alt="">`:''}
+        <span style="position:relative;z-index:1;font-size:3rem">${p.emoji||'👔'}</span>
+      </div>
+      <div class="my-product-actions"><button class="my-prod-action-btn" onclick="deleteMyProduct('${p.id}')">✕</button></div>
+      <div class="product-info"><div class="product-name">${p.name}</div><div class="product-price">$${p.price}</div></div>
+    </div>`).join('');
+}
+
+function openAddProduct(){
+  uploadedImageData=null;
+  document.getElementById('uploadPreview').style.display='none';
+  document.getElementById('uploadPlaceholder').style.display='block';
+  ['newProdName','newProdPrice','newProdDesc'].forEach(id=>document.getElementById(id).value='');
+  openModal('addProductModal');
+}
+
+function handleImageUpload(e){
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=ev=>{uploadedImageData=ev.target.result;const p=document.getElementById('uploadPreview');p.src=uploadedImageData;p.style.display='block';document.getElementById('uploadPlaceholder').style.display='none';};
+  r.readAsDataURL(file);
+}
+
+async function saveProduct(){
+  if(!currentUser)return;
+  const name=document.getElementById('newProdName').value.trim();
+  const price=parseFloat(document.getElementById('newProdPrice').value);
+  const desc=document.getElementById('newProdDesc').value.trim();
+  const cat=document.getElementById('newProdCat').value;
+  if(!name||!price||!desc){notify('⚠️ تنبيه','يرجى ملء جميع الحقول','error');return;}
+  const res=await api('POST','/api/products',{
+    name,price,description:desc,category:cat,
+    emoji:EMOJIS[Math.floor(Math.random()*EMOJIS.length)],
+    color:COLORS[Math.floor(Math.random()*COLORS.length)],
+    seller_id:currentUser.id,
+    seller_name:currentUser.first_name+' '+currentUser.last_name,
+    image:uploadedImageData||null
+  });
+  if(res.success){closeModal('addProductModal');await renderMyProducts();await loadUserProducts();renderProducts(allProducts);notify('✅ تم النشر',`"${name}" نُشر في المتجر`,'success');}
+}
+
+async function deleteMyProduct(id){
+  await api('DELETE','/api/products/'+id);
+  await renderMyProducts();
+  notify('🗑️ تم الحذف','','success');
+}
+
+// ── Secret ────────────────────────────────────────────────
+async function showSecretPage(){
+  showPage('secret');
+  const users=await api('GET','/api/users');
+  const prods=await api('GET','/api/products');
+  const fin=await api('GET','/api/finance');
+  document.getElementById('ownerStats').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+      <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:1rem;text-align:center"><div style="font-size:.8rem;color:var(--muted)">المستخدمون</div><div style="font-size:1.8rem;font-weight:700;color:var(--gold)">${users.length||0}</div></div>
+      <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:1rem;text-align:center"><div style="font-size:.8rem;color:var(--muted)">المنتجات</div><div style="font-size:1.8rem;font-weight:700;color:var(--gold)">${prods.length||0}</div></div>
+      <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:1rem;text-align:center"><div style="font-size:.8rem;color:var(--muted)">حساب الدفع</div><div style="font-size:1.4rem;font-weight:700;color:var(--gold)">$${(fin.balance||0).toFixed(2)}</div></div>
+    </div>`;
+  notify('🔐 تم الوصول','مرحباً في لوحة المالك','gold');
+}
+
+// ── Modals ────────────────────────────────────────────────
+function openModal(id){document.getElementById(id).classList.add('active');}
+function closeModal(id){document.getElementById(id).classList.remove('active');}
+document.querySelectorAll('.modal-overlay').forEach(el=>el.addEventListener('click',function(e){if(e.target===this)closeModal(this.id);}));
+
+// ── Notify ────────────────────────────────────────────────
+let _nt;
+function notify(title,msg,type='success'){
+  const el=document.getElementById('notificationEl');
+  document.getElementById('notifTitle').textContent=title;
+  document.getElementById('notifMsg').textContent=msg;
+  el.className='notification '+type;el.style.display='block';
+  clearTimeout(_nt);_nt=setTimeout(()=>el.style.display='none',3500);
+}
+
+function formatCard(input){let v=input.value.replace(/\D/g,'').substring(0,16);input.value=v.replace(/(.{4})/g,'$1 ').trim();}
+</script>
+</body>
+</html>
